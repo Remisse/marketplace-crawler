@@ -74,5 +74,5 @@ if __name__ == "__main__":
 
     while True:
         new_found_event.wait()
-        send_notification(apobj, f'Nuovi annunci per "{search}"!', "Controlla il terminale.")
+        send_notification(apobj, f'New listings for "{search}"!', "Check your terminal.")
         new_found_event.clear()
