@@ -7,7 +7,7 @@ from crawler import BaseCrawler, SubitoCrawler, WallapopCrawler
 from datetime import datetime
 from threading import Thread, Event
 
-APP_NAME = "Bottarello"
+APP_NAME = "Marketplace Crawler"
 
 SLEEP_S = 60
 
