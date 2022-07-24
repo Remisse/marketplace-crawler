@@ -44,8 +44,9 @@ if __name__ == "__main__":
     init()
 
     # TODO Support more servers?
-    ap_url = "dbus://" if platform.system() == "Linux" else "windows://"
-    apobj = apprise.Apprise().instantiate(ap_url)
+    apobj = apprise.Apprise()
+    apobj.add("dbus://")
+    apobj.add("windows://")
 
     # TODO Improve parsing of launch arguments
     parameters = sys.argv[1:]
