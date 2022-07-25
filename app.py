@@ -8,14 +8,11 @@ from threading import Thread, Event
 
 APP_NAME = "Marketplace Crawler"
 
-SLEEP_S = 60
+SLEEP_S = 30
 
 def log_timestamp(message: str):
     time = datetime.now().strftime("%H:%M")
     print(f"[{time}] {message}")
-
-def send_notification(apobj: apprise.Apprise, title: str, body: str):
-    apobj.notify(title = title, body = body)
 
 def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_interrupt_event: Event):
     text_color = None
@@ -78,7 +75,7 @@ if __name__ == "__main__":
     try:
         while True:
             new_found_event.wait()
-            send_notification(apobj, f'New listings for "{search}"!', "Check your terminal.")
+            apobj.notify(f'New listings for "{search}"!', "Check your terminal.")
             new_found_event.clear()
     except KeyboardInterrupt:
         print(f"\nAttempting to terminate all threads. This can take up to {SLEEP_S} seconds.")
