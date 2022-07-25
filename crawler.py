@@ -143,9 +143,7 @@ class WallapopCrawler(BaseCrawler):
             self.URL_SORT_NEWEST
         )
         page = requests.get(URL, headers = self.HEADERS)
-
-        thawed = jsonpickle.decode(page.content)
-        search_objects = thawed["search_objects"]
+        search_objects = jsonpickle.decode(page.content)["search_objects"]
 
         return [
             Listing(
