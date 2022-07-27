@@ -1,3 +1,4 @@
+from turtle import st
 import apprise
 import requests
 import sys
@@ -12,9 +13,15 @@ APP_NAME = "Marketplace Crawler"
 SLEEP_S = 10
 RETRY_SLEEP_S = 5
 
+SUPPRESS_ERRORS = True
+
 def log_timestamp(message: str):
     time = datetime.now().strftime("%H:%M")
     print(f"[{time}] {message}")
+
+def print_error(message: str):
+    if not SUPPRESS_ERRORS:
+        print(message)
 
 def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_interrupt_event: Event):
     text_color = None
@@ -29,7 +36,7 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
             listings = crawler.crawl()
 
             if error:
-                print(f"{Fore.GREEN}{crawler.__class__.__name__}: resumed!{Style.RESET_ALL}")
+                print_error(f"{Fore.GREEN}{crawler.__class__.__name__}: resumed!{Style.RESET_ALL}")
                 error = False
 
             if len(listings) > 0:
@@ -43,7 +50,7 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
 
             time.sleep(SLEEP_S)
         except requests.exceptions.RequestException:
-            print(f"{Fore.RED}{crawler.__class__.__name__}: connection error. Retrying in {RETRY_SLEEP_S} seconds.{Style.RESET_ALL}")
+            print_error(f"{Fore.RED}{crawler.__class__.__name__}: connection error. Retrying in {RETRY_SLEEP_S} seconds.{Style.RESET_ALL}")
             error = True
             time.sleep(RETRY_SLEEP_S)
 
