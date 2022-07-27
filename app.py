@@ -9,7 +9,7 @@ from threading import Thread, Event
 
 APP_NAME = "Marketplace Crawler"
 
-SLEEP_S = 30
+SLEEP_S = 10
 RETRY_SLEEP_S = 5
 
 def log_timestamp(message: str):
@@ -23,9 +23,14 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
     elif isinstance(crawler, WallapopCrawler):
         text_color = Fore.LIGHTGREEN_EX
 
+    error = False
     while not keyboard_interrupt_event.is_set():
         try:
             listings = crawler.crawl()
+
+            if error:
+                print(f"{Fore.GREEN}{crawler.__class__.__name__}: resumed!{Style.RESET_ALL}")
+                error = False
 
             if len(listings) > 0:
                 log_timestamp("")
@@ -38,8 +43,8 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
 
             time.sleep(SLEEP_S)
         except requests.exceptions.RequestException:
-            print(f"{Fore.RED}{crawler.__class__.__name__}: connection error")
-            print(f"Retrying in {RETRY_SLEEP_S} seconds.{Style.RESET_ALL}")
+            print(f"{Fore.RED}{crawler.__class__.__name__}: connection error. Retrying in {RETRY_SLEEP_S} seconds.{Style.RESET_ALL}")
+            error = True
             time.sleep(RETRY_SLEEP_S)
 
 if __name__ == "__main__":
@@ -82,7 +87,7 @@ if __name__ == "__main__":
     try:
         while True:
             new_found_event.wait()
-            apobj.notify(f'New listings for "{search}"!', "Check your terminal.")
+            apobj.notify("Check your terminal.", f'New listings for "{search}"!')
             new_found_event.clear()
     except KeyboardInterrupt:
         print(f"\nAttempting to terminate all threads. This can take up to {SLEEP_S} seconds.")
