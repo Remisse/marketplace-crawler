@@ -1,4 +1,5 @@
 import apprise
+import requests
 import sys
 import time
 from colorama import Fore, Style, init
@@ -9,6 +10,7 @@ from threading import Thread, Event
 APP_NAME = "Marketplace Crawler"
 
 SLEEP_S = 30
+RETRY_SLEEP_S = 5
 
 def log_timestamp(message: str):
     time = datetime.now().strftime("%H:%M")
@@ -22,18 +24,23 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
         text_color = Fore.LIGHTGREEN_EX
 
     while not keyboard_interrupt_event.is_set():
-        listings = crawler.crawl()
+        try:
+            listings = crawler.crawl()
 
-        if len(listings) > 0:
-            log_timestamp("")
-            for listing in listings:
-                print(f"{text_color}    {listing.url}{Fore.WHITE} {str(int(listing.price))}€")
-            print(Style.RESET_ALL)
+            if len(listings) > 0:
+                log_timestamp("")
+                for listing in listings:
+                    print(f"{text_color}    {listing.url}{Fore.WHITE} {str(int(listing.price))}€")
+                print(Style.RESET_ALL)
 
-            if not new_found_event.is_set():
-                new_found_event.set()
+                if not new_found_event.is_set():
+                    new_found_event.set()
 
-        time.sleep(SLEEP_S)
+            time.sleep(SLEEP_S)
+        except requests.exceptions.RequestException:
+            print(f"{Fore.RED}{crawler.__class__.__name__}: connection error")
+            print(f"Retrying in {RETRY_SLEEP_S} seconds.{Style.RESET_ALL}")
+            time.sleep(RETRY_SLEEP_S)
 
 if __name__ == "__main__":
     # Required on Windows by Colorama
