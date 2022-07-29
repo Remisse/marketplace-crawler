@@ -9,3 +9,11 @@ Simple bot that monitors European marketplaces (currently only Wallapop and Subi
 - [Colorama](https://github.com/tartley/colorama)
 - [jsonpickle](https://jsonpickle.github.io/)
 - [requests](https://requests.readthedocs.io/en/latest/)
+
+## TODO
+
+- [ ] Improve parsing of launch arguments
+- [ ] Let the user choose which crawlers to enable by providing ad-hoc launch arguments
+- [ ] Config file
+- [ ] Read Apprise configuration from file
+- [ ] Vinted support?

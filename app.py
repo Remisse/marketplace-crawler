@@ -1,4 +1,3 @@
-from turtle import st
 import apprise
 import requests
 import sys
@@ -58,12 +57,10 @@ if __name__ == "__main__":
     # Required on Windows by Colorama
     init()
 
-    # TODO Support more servers?
     apobj = apprise.Apprise()
     apobj.add("dbus://")
     apobj.add("windows://")
 
-    # TODO Improve parsing of launch arguments
     parameters = sys.argv[1:]
     if (len(parameters) != 5):
         print('Usage: python ' + sys.argv[0] + ' "<search_term_1> ... <search_term_n>" <category> <minimum_price> <maximum_price> "<ignore_term_1> ... <ignore_term_n>"')
@@ -79,7 +76,6 @@ if __name__ == "__main__":
     new_found_event = Event()
     keyboard_interrupt_event = Event()
 
-    # TODO Let the user choose which crawlers to enable by providing ad-hoc launch arguments
     crawlers = (
         SubitoCrawler(search, category, min_price, max_price, ignored),
         WallapopCrawler(search, category, min_price, max_price, ignored)
