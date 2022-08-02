@@ -5,3 +5,6 @@ def trim(lst: list, max_size: int):
     if len(lst) > max_size:
         return lst[int(max_size / 2):]
     return lst
+
+def tag_coalesce(x, default):
+    return x.text if x is not None else default

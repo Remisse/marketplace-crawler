@@ -1,26 +1,28 @@
+from json import JSONDecodeError
 import apprise
 import requests
 import sys
 import time
 from colorama import Fore, Style, init
-from crawler import BaseCrawler, SubitoCrawler, WallapopCrawler
+from crawler import BaseCrawler, EbayCrawler, SubitoCrawler, WallapopCrawler
 from datetime import datetime
 from threading import Thread, Event
 
 APP_NAME = "Marketplace Crawler"
 
-SLEEP_S = 10
+SLEEP_S = 15
 RETRY_SLEEP_S = 5
 
-SUPPRESS_ERRORS = True
+SUPPRESS_ERRORS = False
 
+"""Prints a message preceded by a timestamp."""
 def log_timestamp(message: str):
     time = datetime.now().strftime("%H:%M")
     print(f"[{time}] {message}")
 
 def print_error(message: str):
     if not SUPPRESS_ERRORS:
-        print(message)
+        log_timestamp(message)
 
 def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_interrupt_event: Event):
     text_color = None
@@ -28,6 +30,8 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
         text_color = Fore.YELLOW
     elif isinstance(crawler, WallapopCrawler):
         text_color = Fore.LIGHTGREEN_EX
+    elif isinstance(crawler, EbayCrawler):
+        text_color = Fore.LIGHTBLUE_EX
 
     error = False
     while not keyboard_interrupt_event.is_set():
@@ -41,14 +45,14 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
             if len(listings) > 0:
                 log_timestamp("")
                 for listing in listings:
-                    print(f"{text_color}    {listing.url}{Fore.WHITE} {str(int(listing.price))}€")
+                    print(f"    {text_color}{listing.url} {Fore.WHITE}{Style.DIM}{listing.title[:40]} {Style.NORMAL}{listing.price} {listing.shipping_cost}")
                 print(Style.RESET_ALL)
 
                 if not new_found_event.is_set():
                     new_found_event.set()
 
             time.sleep(SLEEP_S)
-        except requests.exceptions.RequestException:
+        except (requests.exceptions.RequestException, KeyError, JSONDecodeError):
             print_error(f"{Fore.RED}{crawler.__class__.__name__}: connection error. Retrying in {RETRY_SLEEP_S} seconds.{Style.RESET_ALL}")
             error = True
             time.sleep(RETRY_SLEEP_S)
@@ -78,7 +82,8 @@ if __name__ == "__main__":
 
     crawlers = (
         SubitoCrawler(search, category, min_price, max_price, ignored),
-        WallapopCrawler(search, category, min_price, max_price, ignored)
+        WallapopCrawler(search, category, min_price, max_price, ignored),
+        EbayCrawler(search, category, min_price, max_price, ignored, "it")
     )
 
     threads = []
