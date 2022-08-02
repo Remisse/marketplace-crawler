@@ -1,8 +1,14 @@
 # marketplace-crawler
 
-Simple bot that monitors European marketplaces (currently only Wallapop and Subito) and notifies you of new listings as they are published.
+Simple bot that monitors marketplaces available in Europe and notifies you of new listings as they are published.
 
-## Dependencies:
+## Supported marketplaces
+
+- Ebay
+- Subito (IT)
+- Wallapop (ES, IT)
+
+## Dependencies
 
 - [Apprise](https://github.com/caronc/apprise)
 - [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/)
