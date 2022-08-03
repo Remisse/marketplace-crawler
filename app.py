@@ -3,6 +3,7 @@ import apprise
 import requests
 import sys
 import time
+import util
 from colorama import Fore, Style, init
 from crawler import BaseCrawler, EbayCrawler, SubitoCrawler, WallapopCrawler
 from datetime import datetime
@@ -13,7 +14,7 @@ APP_NAME = "Marketplace Crawler"
 SLEEP_S = 15
 RETRY_SLEEP_S = 5
 
-SUPPRESS_ERRORS = False
+SUPPRESS_ERRORS = True
 
 """Prints a message preceded by a timestamp."""
 def log_timestamp(message: str):
@@ -45,7 +46,7 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
             if len(listings) > 0:
                 log_timestamp("")
                 for listing in listings:
-                    print(f"    {text_color}{listing.url} {Fore.WHITE}{Style.DIM}{listing.title[:40]} {Style.NORMAL}{listing.price} {listing.shipping_cost}")
+                    print(f"    {text_color}{listing.url} {Fore.WHITE}{Style.DIM}{util.truncate(listing.title, 40)} {Style.NORMAL}{listing.price} {listing.shipping_cost}")
                 print(Style.RESET_ALL)
 
                 if not new_found_event.is_set():

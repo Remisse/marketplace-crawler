@@ -24,10 +24,12 @@ class BaseCrawler(object, metaclass = ABCMeta):
         self.__saved_listings = []
         self.__saved_pinned = []
 
+    """Internal method. Do not use."""
     @abstractmethod
     def category_adapter(self, cat: str) -> str:
         pass
 
+    """Internal method. Do not use."""
     @abstractmethod
     def pinned_link_callable(self, link):
         pass
@@ -174,20 +176,19 @@ class EbayCrawler(BaseCrawler):
     PRICE_CLASS = ".s-item__price"
     TITLE_CLASS = ".s-item__title"
     SHIPPING_CLASS = ".s-item__shipping"
+    HIGHLIGHT_CLASS = ".LIGHT_HIGHLIGHT"
 
     def __init__(self, query, category, min_price, max_price, ignored, locale: str):
         super().__init__(query, category, min_price, max_price, ignored)
 
-        ignored_keywords = "+-".join(ignored)
+        ignored_keywords = "+-" + "+-".join(ignored)
 
         self.url: str = (
-            self.URL_PART1 +
-            locale + 
+            self.URL_PART1 + locale + 
             self.URL_PART2 + 
             self.category_adapter(self.category) + 
             self.URL_PART3 + 
-            self.URL_QUERY + self.query.replace(" ", "+") + 
-            "+-" + ignored_keywords + 
+            self.URL_QUERY + self.query.replace(" ", "+") + ignored_keywords + 
             self.URL_MIN_PRICE + self.min_price + 
             self.URL_MAX_PRICE + self.max_price + 
             self.URL_BUY_NOW_ONLY + 
@@ -206,13 +207,11 @@ class EbayCrawler(BaseCrawler):
         soup = BeautifulSoup(page.content, "html.parser")
 
         item_cards = soup.select(self.ITEM_CARD_CLASS)
-        # We want to strip the "New listing" tag from all the titles, if present.
-        # If the first item (item 0 appears to be a placeholder) does not have this tag, then all the others will not as well.
-        new_listing_len = len(util.tag_coalesce(item_cards[1].select_one(".LIGHT_HIGHLIGHT"), ""))
         return [
             Listing(
                 url = card.select_one(self.LINK_CLASS)['href'].split("?")[0],
-                title = card.select_one(self.TITLE_CLASS).text[new_listing_len:],
+                # We want to strip the "New listing" tag from all the titles, if present.
+                title = card.select_one(self.TITLE_CLASS).text[len(util.tag_coalesce(card.select_one(self.HIGHLIGHT_CLASS), "")):],
                 price = card.select_one(self.PRICE_CLASS).text.split("€")[0],
                 shipping_cost = util.tag_coalesce(card.select_one(self.SHIPPING_CLASS), ""),
                 is_not_sold = True,
