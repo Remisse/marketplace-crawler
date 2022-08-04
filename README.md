@@ -7,6 +7,7 @@ Simple bot that monitors marketplaces available in Europe and notifies you of ne
 - Ebay
 - Subito (IT)
 - Wallapop (ES, IT)
+- Vinted
 
 ## Dependencies
 
@@ -18,8 +19,9 @@ Simple bot that monitors marketplaces available in Europe and notifies you of ne
 
 ## TODO
 
+- [ ] More categories
 - [ ] Improve parsing of launch arguments
 - [ ] Let the user choose which crawlers to enable by providing ad-hoc launch arguments
 - [ ] Config file
 - [ ] Read Apprise configuration from file
-- [ ] Vinted support?
+- [x] Vinted support

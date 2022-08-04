@@ -5,7 +5,7 @@ import sys
 import time
 import util
 from colorama import Fore, Style, init
-from crawler import BaseCrawler, EbayCrawler, SubitoCrawler, WallapopCrawler
+from crawler import *
 from datetime import datetime
 from threading import Thread, Event
 
@@ -14,7 +14,7 @@ APP_NAME = "Marketplace Crawler"
 SLEEP_S = 15
 RETRY_SLEEP_S = 5
 
-SUPPRESS_ERRORS = True
+SUPPRESS_ERRORS = False
 
 """Prints a message preceded by a timestamp."""
 def log_timestamp(message: str):
@@ -33,6 +33,8 @@ def crawler_callable(crawler: BaseCrawler, new_found_event: Event, keyboard_inte
         text_color = Fore.LIGHTGREEN_EX
     elif isinstance(crawler, EbayCrawler):
         text_color = Fore.LIGHTBLUE_EX
+    elif isinstance(crawler, VintedCrawler):
+        text_color = Fore.LIGHTCYAN_EX
 
     error = False
     while not keyboard_interrupt_event.is_set():
@@ -84,7 +86,8 @@ if __name__ == "__main__":
     crawlers = (
         SubitoCrawler(search, category, min_price, max_price, ignored),
         WallapopCrawler(search, category, min_price, max_price, ignored),
-        EbayCrawler(search, category, min_price, max_price, ignored, "it")
+        EbayCrawler(search, category, min_price, max_price, ignored, "it"),
+        VintedCrawler(search, category, min_price, max_price, ignored)
     )
 
     threads = []
