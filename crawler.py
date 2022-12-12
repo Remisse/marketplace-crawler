@@ -62,7 +62,9 @@ class SubitoCrawler(BaseCrawler):
     URL_MAX_PRICE = "&pe="
 
     CATEGORIES = {
-        "games": "videogiochi"
+        "games": "videogiochi",
+        "hardware": "informatica",
+        "": "usato"
     }
 
     ITEM_CARD_CLASS = ".item-card"
@@ -117,17 +119,17 @@ class WallapopCrawler(BaseCrawler):
     LISTING_BASE_URL = "https://wallapop.com/item/"
 
     CATEGORIES = {
-        "games": "12900"
+        "games": "12900",
+        "hardware": "15000",
+        "": ""
     }
-
-    LISTING_MAX_AGE_S = 10800.0
 
     def __init__(self, query, category, min_price, max_price, ignored):
         super().__init__(query, category, min_price, max_price, ignored)
         self.url: str = (
             self.URL_BASE + 
             self.URL_QUERY + self.query.replace(" ", "+") + 
-            self.URL_CATEGORY + self.category_adapter(self.category) + 
+            (self.URL_CATEGORY if self.category != "" else "") + self.category_adapter(self.category) + 
             self.URL_MID +
             self.URL_MIN_PRICE + self.min_price + 
             self.URL_MAX_PRICE + self.max_price +
@@ -152,7 +154,6 @@ class WallapopCrawler(BaseCrawler):
                 is_not_pinned = True
             ) 
             for item in search_objects
-            if (datetime.now().timestamp() - float(item["modification_date"]) / 1000) <= self.LISTING_MAX_AGE_S
         ]
 
 class EbayCrawler(BaseCrawler):
@@ -168,6 +169,7 @@ class EbayCrawler(BaseCrawler):
 
     CATEGORIES = {
         "games": "1249/",
+        "hardware": "175673/",
         "": ""
     }
 
@@ -234,7 +236,9 @@ class VintedCrawler(BaseCrawler):
     URL_SORT_NEWEST="&order=newest_first"
 
     CATEGORIES = {
-        "games": "2313"
+        "games": "2313",
+        "hardware": "2313", # There are no dedicated hardware sections on Vinted. "Videogames" seems to be the most popular alternative.
+        "": ""
     }
 
     def __init__(self, query, category, min_price, max_price, ignored):
@@ -242,7 +246,7 @@ class VintedCrawler(BaseCrawler):
         self.url: str = (
             self.URL_PART1 + 
             self.URL_QUERY + self.query.replace(" ", "+") + 
-            self.URL_CATEGORY + self.category_adapter(self.category) + 
+            (self.URL_CATEGORY + self.category_adapter(self.category) if self.category != "" else "") + 
             self.URL_MIN_PRICE + self.min_price + 
             self.URL_MAX_PRICE + self.max_price + 
             self.URL_SORT_NEWEST
